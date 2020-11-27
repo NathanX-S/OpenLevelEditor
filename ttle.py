@@ -37,7 +37,7 @@ class ToontownLevelEditor(ShowBase):
         loadPrcFile('editor.prc')
 
         builtins.userfiles = self.config.GetString('userfiles-directory')
-        
+
         if not os.path.exists(userfiles):
             pathlib.Path(userfiles).mkdir(parents = True, exist_ok = True)
 
@@ -106,9 +106,16 @@ class ToontownLevelEditor(ShowBase):
         self.le.startUp(args.dnaPath)
 
     def __checkForFiles(self):
+        from panda3d.core import Filename
         # Make custom hood directory if it doesn't exist
+        appdata = Filename.getUserAppdataDirectory() + "/OpenToontownTools"
         if not os.path.exists(f'{userfiles}/hoods/'):
             os.mkdir(f'{userfiles}/hoods/')
+        if not os.path.exists(appdata):
+            os.mkdir(appdata)
+        appdata = appdata + "/OpenLevelEditor"
+        if not os.path.exists(appdata):
+            os.mkdir(appdata)
 
     def __importMainLibs(self):
         builtin_dict = builtins.__dict__
