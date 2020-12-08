@@ -5,6 +5,7 @@ from locale import atof
 from .LevelEditorGlobals import *
 from .PieMenu import *
 from .ScrollMenu import *
+from .EditorUtil import *
 
 
 class LevelStyleManager:
@@ -92,7 +93,8 @@ class LevelStyleManager:
                 if pair[0] in style.__dict__:
                     pair_0 = pair[0]
                     # Convert some numerical values
-                    if pair_0 in ['color', 'kern', 'wiggle', 'stumble', 'stomp', 'curve', 'x', 'z', 'scaleX', 'scaleZ', 'roll']:
+                    if pair_0 in ['color', 'kern', 'wiggle', 'stumble', 'stomp', 'curve', 'x', 'z', 'scaleX', 'scaleZ',
+                                  'roll']:
                         style[pair_0] = eval(pair[1])
                     else:
                         style[pair_0] = pair[1]
@@ -145,7 +147,6 @@ class LevelStyleManager:
         """
         baseline = DNASignBaseline()
         # Set some example text:
-        DNASetBaselineString(baseline, "Example Text")
         baselineStyle.copyTo(baseline)
         return baseline.traverse(hidden, DNASTORE, 1)
 

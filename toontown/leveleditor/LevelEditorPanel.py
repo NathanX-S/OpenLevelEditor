@@ -7,11 +7,13 @@ from tkinter import ttk
 from direct.showbase.TkGlobal import *
 from direct.tkwidgets import Floater
 
+from .DNASerializer import DNASerializer
 from .LevelStyleManager import *
 from .LevelEditorGlobals import *
 from .LESceneGraphExplorer import *
 
 from toontown.fixes import VectorWidgets
+
 
 class LevelEditorPanel(Pmw.MegaToplevel):
     """
@@ -52,15 +54,15 @@ class LevelEditorPanel(Pmw.MegaToplevel):
         menuBar.addmenuitem('Level Editor', 'command',
                             'Load DNA from specified file',
                             label = 'Load DNA...',
-                            command = self.levelEditor.loadSpecifiedDNAFile)
+                            command = DNASerializer.loadSpecifiedDNAFile)
         menuBar.addmenuitem('Level Editor', 'command',
                             'Save DNA data to specified file',
                             label = 'Save DNA As...',
-                            command = self.levelEditor.saveToSpecifiedDNAFile)
+                            command = DNASerializer.saveToSpecifiedDNAFile)
         menuBar.addmenuitem('Level Editor', 'command',
                             'Save DNA File',
                             label = 'Save DNA',
-                            command = self.levelEditor.outputDNADefaultFile)
+                            command = DNASerializer.outputDNADefaultFile)
         menuBar.addmenuitem('Level Editor', 'separator')
         menuBar.addmenuitem('Level Editor', 'command',
                             'Edit Visibility Groups',
@@ -89,19 +91,19 @@ class LevelEditorPanel(Pmw.MegaToplevel):
         menuBar.addmenuitem('Style', 'command',
                             "Save Selected Object's Color",
                             label = 'Save Color',
-                            command = self.levelEditor.saveColor)
+                            command = DNASerializer.saveColor)
         menuBar.addmenuitem('Style', 'command',
                             "Save Selected Baseline's Style",
                             label = 'Save Baseline Style',
-                            command = self.levelEditor.saveBaselineStyle)
+                            command = DNASerializer.saveBaselineStyle)
         menuBar.addmenuitem('Style', 'command',
                             "Save Selected Wall's Style",
                             label = 'Save Wall Style',
-                            command = self.levelEditor.saveWallStyle)
+                            command = DNASerializer.saveWallStyle)
         menuBar.addmenuitem('Style', 'command',
                             "Save Selected Buildings's Style",
                             label = 'Save Bldg Style',
-                            command = self.levelEditor.saveBuildingStyle)
+                            command = DNASerializer.saveBuildingStyle)
         menuBar.addmenuitem('Style', 'separator')
         menuBar.addmenuitem('Style', 'command',
                             'Reload Color Palettes',
@@ -373,8 +375,6 @@ class LevelEditorPanel(Pmw.MegaToplevel):
                     landmarkBuildingsPage, width = 24,
                     textvariable = self.landmarkBuildingNameString)
             self.landmarkBuildingNameBox.pack(expand = 0, fill = X)
-
-
 
         # ANIMATED BUILDINGS
         Label(animBuildingsPage, text = 'Animated Buildings',
@@ -674,10 +674,10 @@ class LevelEditorPanel(Pmw.MegaToplevel):
         self.fPaths = IntVar()
         self.fPaths.set(0)
         self.pathButton = ttk.Checkbutton(spButtons,
-                                      text = 'Show Paths',
-                                      width = 12,
-                                      variable = self.fPaths,
-                                      command = self.toggleSuitPaths)
+                                          text = 'Show Paths',
+                                          width = 12,
+                                          variable = self.fPaths,
+                                          command = self.toggleSuitPaths)
         self.pathButton.pack(side = LEFT, expand = 1, fill = X)
 
         self.zoneColor = IntVar()
@@ -688,6 +688,16 @@ class LevelEditorPanel(Pmw.MegaToplevel):
                 variable = self.zoneColor,
                 command = self.levelEditor.toggleZoneColors)
         self.colorZoneButton1.pack(side = LEFT, expand = 1, fill = X)
+
+        self.pathLabels = IntVar()
+        self.pathLabels.set(0)
+        self.pathLabelsButton = ttk.Checkbutton(
+                spButtons,
+                text = 'Show Point Labels', width = 20,
+                variable = self.pathLabels,
+                command = self.togglePathLabels)
+        self.pathLabelsButton.pack(side = LEFT, expand = 1, fill = X)
+
         spButtons.pack(fill = X)
 
         spButtons = Frame(suitPathPage)
@@ -736,10 +746,10 @@ class LevelEditorPanel(Pmw.MegaToplevel):
         self.fCells = IntVar()
         self.fCells.set(0)
         self.cellButton = ttk.Checkbutton(bcButtons,
-                                      text = 'Show Cells',
-                                      width = 12,
-                                      variable = self.fCells,
-                                      command = self.toggleBattleCells)
+                                          text = 'Show Cells',
+                                          width = 12,
+                                          variable = self.fCells,
+                                          command = self.toggleBattleCells)
         self.cellButton.pack(side = LEFT, expand = 1, fill = X)
 
         self.colorZoneButton2 = ttk.Checkbutton(
@@ -750,12 +760,13 @@ class LevelEditorPanel(Pmw.MegaToplevel):
         self.colorZoneButton2.pack(side = LEFT, expand = 1, fill = X)
 
         ttk.Button(bcButtons,
-               text = 'Connect prop to cell',
-               command = self.levelEditor.connectToCell).pack(side = LEFT, expand = 1, fill = X)
+                   text = 'Connect prop to cell',
+                   command = self.levelEditor.connectToCell).pack(side = LEFT, expand = 1, fill = X)
 
         ttk.Button(bcButtons,
-               text = 'Disconnect prop',
-               command = lambda p0 = True: self.levelEditor.connectToCell(p0)).pack(side = LEFT, expand = 1, fill = X)
+                   text = 'Disconnect prop',
+                   command = lambda p0 = True: self.levelEditor.connectToCell(p0)).pack(side = LEFT, expand = 1,
+                                                                                        fill = X)
 
         bcButtons.pack(fill = X)
 
@@ -790,32 +801,32 @@ class LevelEditorPanel(Pmw.MegaToplevel):
         snapFrame = Frame(hull)
         self.fMapVis = IntVar()
         self.fMapVis.set(0)
-        #self.mapSnapButton = ttk.Checkbutton(snapFrame,
-                                         #text = 'Map Vis',
-                                         #width = 12,
-                                         #variable = self.fMapVis,
-                                         #command = self.toggleMapVis)
+        # self.mapSnapButton = ttk.Checkbutton(snapFrame,
+        # text = 'Map Vis',
+        # width = 12,
+        # variable = self.fMapVis,
+        # command = self.toggleMapVis)
         # self.mapSnapButton.pack(side = LEFT, expand = 1, fill = X)
 
         Label(snapFrame, text = 'Snapping', width = 8, anchor = 'nw',
-            font = ('Calibri', 10, 'bold')).pack(padx = 5, side = LEFT, expand = 1, fill = X)
+              font = ('Calibri', 10, 'bold')).pack(padx = 5, side = LEFT, expand = 1, fill = X)
 
         self.fXyzSnap = IntVar()
         self.fXyzSnap.set(0)
         self.xyzSnapButton = ttk.Checkbutton(snapFrame,
-                                         text = 'Position Snapping',
-                                         width = 18,
-                                         variable = self.fXyzSnap,
-                                         command = self.toggleXyzSnap)
+                                             text = 'Position Snapping',
+                                             width = 18,
+                                             variable = self.fXyzSnap,
+                                             command = self.toggleXyzSnap)
         self.xyzSnapButton.pack(side = LEFT, expand = 1, fill = X)
 
         self.fHprSnap = IntVar()
         self.fHprSnap.set(0)
         self.hprSnapButton = ttk.Checkbutton(snapFrame,
-                                         text = 'Rotation Snapping',
-                                         width = 18,
-                                         variable = self.fHprSnap,
-                                         command = self.toggleHprSnap)
+                                             text = 'Rotation Snapping',
+                                             width = 18,
+                                             variable = self.fHprSnap,
+                                             command = self.toggleHprSnap)
         self.hprSnapButton.pack(side = LEFT, expand = 1, fill = X)
 
         def toggleWidgetHandles(s = self):
@@ -829,45 +840,53 @@ class LevelEditorPanel(Pmw.MegaToplevel):
         self.fPlaneSnap = IntVar()
         self.fPlaneSnap.set(0)
         self.planeSnapButton = ttk.Checkbutton(snapFrame,
-                                           text = 'Plane Snapping',
-                                           width = 18,
-                                           variable = self.fPlaneSnap,
-                                           command = toggleWidgetHandles)
+                                               text = 'Plane Snapping',
+                                               width = 18,
+                                               variable = self.fPlaneSnap,
+                                               command = toggleWidgetHandles)
         self.planeSnapButton.pack(side = LEFT, expand = 1, fill = X)
 
         snapFrame.pack(fill = X)
 
-
         # Visual Options
         visualFrame = Frame(hull)
-        Label(visualFrame, text = 'Visual', width = 8,anchor = 'nw',
-            font = ('Calibri', 10, 'bold')).pack(padx = 5, side = LEFT, expand = 1, fill = X)
+        Label(visualFrame, text = 'Visual', width = 8, anchor = 'nw',
+              font = ('Calibri', 10, 'bold')).pack(padx = 5, side = LEFT, expand = 1, fill = X)
 
         self.fLabel = IntVar()
         self.fLabel.set(0)
         self.labelButton = ttk.Checkbutton(visualFrame,
-                                       text = 'Show Zone Labels',
-                                       width = 18,
-                                       variable = self.fLabel,
-                                       command = self.toggleZoneLabels)
+                                           text = 'Show Zone Labels',
+                                           width = 18,
+                                           variable = self.fLabel,
+                                           command = self.toggleZoneLabels)
         self.labelButton.pack(side = LEFT, expand = 1, fill = X)
+
+        self.fLabelOnTop = IntVar()
+        self.fLabelOnTop.set(0)
+        self.labelOnTopButton = ttk.Checkbutton(visualFrame,
+                                                text = 'Labels Always On Top',
+                                                width = 20,
+                                                variable = self.fLabelOnTop,
+                                                command = self.toggleZoneLabelsOnTop)
+        self.labelOnTopButton.pack(side = LEFT, expand = 1, fill = X)
 
         self.fGrid = IntVar()
         self.fGrid.set(0)
         base.direct.gridButton = ttk.Checkbutton(visualFrame,
-                                             text = 'Show Grid',
-                                             width = 18,
-                                             variable = self.fGrid,
-                                             command = self.toggleGrid)
+                                                 text = 'Show Grid',
+                                                 width = 18,
+                                                 variable = self.fGrid,
+                                                 command = self.toggleGrid)
         base.direct.gridButton.pack(side = LEFT, expand = 1, fill = X)
 
         self.fMaya = IntVar()
         self.fMaya.set(1)
         self.mayaButton = ttk.Checkbutton(visualFrame,
-                                      text = 'Maya Cam',
-                                      width = 18,
-                                      variable = self.fMaya,
-                                      command = self.toggleMaya)
+                                          text = 'Maya Cam',
+                                          width = 18,
+                                          variable = self.fMaya,
+                                          command = self.toggleMaya)
         self.mayaButton.pack(side = LEFT, expand = 1, fill = X)
 
         # Make maya mode on by default
@@ -879,8 +898,8 @@ class LevelEditorPanel(Pmw.MegaToplevel):
 
         if ConfigVariableBool("want-experimental", False):
             buttonFrame4 = Frame(hull)
-            Label(buttonFrame4, text = 'Experimental', width = 8,anchor = 'nw',
-                font = ('Calibri', 10, 'bold')).pack(padx = 5, side = LEFT, expand = 1, fill = X)
+            Label(buttonFrame4, text = 'Experimental', width = 8, anchor = 'nw',
+                  font = ('Calibri', 10, 'bold')).pack(padx = 5, side = LEFT, expand = 1, fill = X)
             self.driveMode = IntVar()
             self.driveMode.set(0)
             self.driveModeButton = ttk.Checkbutton(
@@ -914,20 +933,20 @@ class LevelEditorPanel(Pmw.MegaToplevel):
         # Object Functions
         objectFrame = Frame(hull)
         ttk.Label(objectFrame, text = 'Object', width = 8, anchor = 'nw',
-            font = ('Calibri', 10, 'bold')).pack(padx = 5, side = LEFT, expand = 1, fill = X)
+                  font = ('Calibri', 10, 'bold')).pack(padx = 5, side = LEFT, expand = 1, fill = X)
 
         self.colorEntry = VectorWidgets.ColorEntry(
                 objectFrame, text = 'Select Color', value = (0, 0, 0, 255),
                 relief = FLAT, command = self.updateSelectedObjColor)
         self.colorEntry.menu.add_command(
-                label = 'Save Color', command = self.levelEditor.saveColor)
+                label = 'Save Color', command = DNASerializer.saveColor)
         self.colorEntry.pack(side = LEFT, expand = 1, fill = X)
 
         self.selectButton = ttk.Button(objectFrame,
-                                   text = 'Place Selected',
-                                   width = 18,
-                                   command = lambda: last.place()
-                                   )
+                                       text = 'Place Selected',
+                                       width = 18,
+                                       command = lambda: last.place()
+                                       )
         self.selectButton.pack(side = LEFT, expand = 1, fill = X)
         objectFrame.pack(fill = X)
 
@@ -966,6 +985,21 @@ class LevelEditorPanel(Pmw.MegaToplevel):
             self.levelEditor.labelZones()
         else:
             self.levelEditor.clearZoneLabels()
+
+    def toggleZoneLabelsOnTop(self):
+        self.levelEditor.labelsOnTop = self.fLabelOnTop.get()
+        for lbl in self.levelEditor.zoneLabels:
+            lbl.setDepthTest(not self.fLabelOnTop.get())
+        for lbl in self.levelEditor.NPToplevel.findAllMatches('**/suit_point_label_*'):
+            lbl.setDepthTest(not self.fLabelOnTop.get())
+
+    def togglePathLabels(self):
+        if self.pathLabels.get():
+            for lbl in self.levelEditor.NPToplevel.findAllMatches('**/suit_point_label_*'):
+                lbl.show()
+        else:
+            for lbl in self.levelEditor.NPToplevel.findAllMatches('**/suit_point_label_*'):
+                lbl.hide()
 
     def toggleXyzSnap(self):
         base.direct.grid.setXyzSnap(self.fXyzSnap.get())
